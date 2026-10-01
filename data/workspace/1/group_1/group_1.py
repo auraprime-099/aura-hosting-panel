@@ -1323,30 +1323,50 @@ def info_group_restricted(func):
     @wraps(func)
     async def wrapper(update: Update, context: ContextTypes.DEFAULT_TYPE):
         user = update.effective_user
+        chat = update.effective_chat
+        
+        if chat:
+            logger.info(f"[GROUP_CMD] chat_id={chat.id} type={chat.type} title={getattr(chat, 'title', None)!r} user={user.id if user else None}")
+
         if user and user.id == ADMIN_ID:
             return await func(update, context)
-        chat = update.effective_chat
+            
         if chat and chat.type in (ChatType.GROUP, ChatType.SUPERGROUP):
-            if not is_group_authorized(chat.id):
-                official_link = get_official_group_link()
-                btn_text = get_group_alert_btn_text()
-                btn_emoji = get_group_alert_btn_emoji()
-                keyboard = [
-                    [InlineKeyboardButton(
-                        btn_text,
-                        url=official_link,
-                        _emoji_id=btn_emoji,
-                    )]
-                ]
-                alert_text = get_group_alert_msg()
-                if update.message:
-                    await update.message.reply_text(
-                        alert_text,
-                        parse_mode=ParseMode.HTML,
-                        reply_markup=InlineKeyboardMarkup(keyboard),
-                        disable_web_page_preview=True,
-                    )
-                return
+            # Auto-detect official group by title or if official_group_id is not configured
+            title = getattr(chat, 'title', '') or ''
+            title_lower = title.lower()
+            is_official = False
+            if "user to info" in title_lower or "usertoinfo" in title_lower or any(k in title for k in ["𝐔ꜱᴇʀ", "𝐈ɴꜰᴏ", "ᴜꜱᴇʀ", "ɪɴꜰᴏ", "USER TO INFO"]):
+                is_official = True
+            
+            db = load_db()
+            if not db.get("official_group_id") and is_official:
+                set_official_group(chat.id)
+                add_approved_group(chat.id, title)
+                logger.info(f"Auto-configured official group: {chat.id} ({title})")
+            
+            if is_official or is_group_authorized(chat.id):
+                return await func(update, context)
+
+            official_link = get_official_group_link()
+            btn_text = get_group_alert_btn_text()
+            btn_emoji = get_group_alert_btn_emoji()
+            keyboard = [
+                [InlineKeyboardButton(
+                    btn_text,
+                    url=official_link,
+                    _emoji_id=btn_emoji,
+                )]
+            ]
+            alert_text = get_group_alert_msg()
+            if update.message:
+                await update.message.reply_text(
+                    alert_text,
+                    parse_mode=ParseMode.HTML,
+                    reply_markup=InlineKeyboardMarkup(keyboard),
+                    disable_web_page_preview=True,
+                )
+            return
         return await func(update, context)
     return wrapper
 
@@ -5286,7 +5306,17 @@ async def grp_set_link_prompt(update: Update, context: ContextTypes.DEFAULT_TYPE
     await query.edit_message_text(text, parse_mode=ParseMode.HTML, reply_markup=InlineKeyboardMarkup(keyboard))
 
 async def approve_group_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
-    if update.effective_user.id != ADMIN_ID:
+    user = update.effective_user
+    chat = update.effective_chat
+    is_allowed = (user and user.id == ADMIN_ID)
+    if not is_allowed and chat and chat.type in (ChatType.GROUP, ChatType.SUPERGROUP):
+        try:
+            m = await chat.get_member(user.id)
+            if m.status in ("creator", "administrator"):
+                is_allowed = True
+        except Exception:
+            pass
+    if not is_allowed:
         await update.message.reply_text("❌ Unauthorized.")
         return
     chat_id = None
@@ -5390,7 +5420,17 @@ async def revoke_group_command(update: Update, context: ContextTypes.DEFAULT_TYP
         )
 
 async def set_official_group_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
-    if update.effective_user.id != ADMIN_ID:
+    user = update.effective_user
+    chat = update.effective_chat
+    is_allowed = (user and user.id == ADMIN_ID)
+    if not is_allowed and chat and chat.type in (ChatType.GROUP, ChatType.SUPERGROUP):
+        try:
+            m = await chat.get_member(user.id)
+            if m.status in ("creator", "administrator"):
+                is_allowed = True
+        except Exception:
+            pass
+    if not is_allowed:
         await update.message.reply_text("❌ Unauthorized.")
         return
     chat_id = None
@@ -5412,6 +5452,8 @@ async def set_official_group_command(update: Update, context: ContextTypes.DEFAU
         return
 
     set_official_group(chat_id)
+    title = update.effective_chat.title if update.effective_chat else ""
+    add_approved_group(chat_id, title)
     await update.message.reply_text(
         f"👑 <b>Official Group Set!</b>\nID: <code>{chat_id}</code>",
         parse_mode=ParseMode.HTML,
