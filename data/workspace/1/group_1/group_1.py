@@ -581,6 +581,8 @@ def load_db() -> Dict[str, Any]:
         with open(DB_FILE, "r") as f:
             data = json.load(f)
             defaults = {
+                "users": [],
+                "groups": [],
                 "approved_groups": [],
                 "approved_groups_meta": {},
                 "official_group_id": None,
@@ -6604,8 +6606,11 @@ class KeepAliveHandler(BaseHTTPRequestHandler):
         pass
 
 def run_keep_alive():
-    server = HTTPServer(('0.0.0.0', PORT), KeepAliveHandler)
-    server.serve_forever()
+    try:
+        server = HTTPServer(('0.0.0.0', PORT), KeepAliveHandler)
+        server.serve_forever()
+    except Exception as e:
+        logger.info(f"Keep-alive server skipped or port in use: {e}")
 
 async def ignore_regular_messages(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     return

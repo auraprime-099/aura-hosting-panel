@@ -1,1 +1,22 @@
-{}
+{
+    "users": [],
+    "groups": [],
+    "approved_groups": [],
+    "approved_groups_meta": {},
+    "official_group_id": null,
+    "official_group_link": "",
+    "group_alert_msg": "",
+    "group_alert_btn_text": "\ud83d\ude80 JOIN OFFICIAL GROUP",
+    "group_alert_btn_emoji": "6138734238628845209",
+    "disabled_commands": [],
+    "leak_approvals": [],
+    "trial_usage": {},
+    "trial_limit": 2,
+    "trial_user_limit": 0,
+    "trial_users": [],
+    "maintenance_mode": false,
+    "blacklisted_numbers": [],
+    "bot_offline": false,
+    "last_broadcast": [],
+    "force_join_targets": []
+}
