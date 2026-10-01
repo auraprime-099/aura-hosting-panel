@@ -1,0 +1,29 @@
+# Python cache
+__pycache__/
+*.py[cod]
+*$py.class
+*.pyc
+
+# Virtual environments
+venv/
+env/
+.venv/
+
+# Environment files
+.env
+
+# SQLite temp & journal files
+*.db-journal
+*.db-wal
+*.db-shm
+
+# Log files (prevent disk volume full on hosting)
+*.log
+logs/
+*.out
+nohup.out
+docker.log
+
+# Scratch / Dev test files
+scratch/
+temp_mail_bot_project.zip
