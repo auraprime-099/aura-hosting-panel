@@ -1,0 +1,75 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="glass-card dashboard">
+    <div class="header">
+        <h2>📊 Table: {{ table_name }}</h2>
+        <div class="user-info">
+            <a href="{{ url_for('my_database_tables', db_id=db.id) }}" class="btn btn-secondary">← Back to Tables</a>
+            <a href="{{ url_for('my_databases') }}" class="btn btn-secondary">All My Databases</a>
+            <a href="{{ url_for('dashboard') }}" class="btn btn-secondary">Dashboard</a>
+        </div>
+    </div>
+    <div class="files-list">
+        <div class="file-grid" style="overflow-x:auto;">
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        {% for col in columns %}
+                            <th>{{ col }}</th>
+                        {% endfor %}
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for row in rows %}
+                        <tr>
+                            {% for col in columns %}
+                                <td>{{ row[col] }}</td>
+                            {% endfor %}
+                            <td>
+                                <a href="{{ url_for('my_edit_row', db_id=db.id, table_name=table_name, row_id=row[0]) }}" class="btn btn-edit">✏️ Edit</a>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <div class="upload-section" style="margin-top: 2rem;">
+        <h3>🔧 Execute SQL</h3>
+        <textarea id="sql-query" rows="5" style="width:100%; background:#1e1e2f; color:#fff; border-radius:12px; padding:1rem; font-family: monospace;" placeholder="SELECT * FROM users"></textarea>
+        <button id="exec-sql" class="btn btn-primary" style="margin-top:1rem;">▶ Run SQL</button>
+        <div id="sql-result" style="margin-top:1rem;"></div>
+    </div>
+</div>
+<script>
+    $('#exec-sql').click(function() {
+        var sql = $('#sql-query').val();
+        $.post('{{ url_for("my_execute_sql", db_id=db.id) }}', {sql: sql}, function(data) {
+            if (data.success) {
+                if (data.columns) {
+                    var html = '<table class="data-table" style="width:100%;">';
+                    html += '<thead><tr>';
+                    for (var i=0; i<data.columns.length; i++) {
+                        html += '<th>' + data.columns[i] + '</th>';
+                    }
+                    html += '</tr></thead><tbody>';
+                    for (var r=0; r<data.rows.length; r++) {
+                        html += '<tr>';
+                        for (var c=0; c<data.columns.length; c++) {
+                            html += '<td>' + data.rows[r][data.columns[c]] + '</td>';
+                        }
+                        html += '</tr>';
+                    }
+                    html += '</tbody></table>';
+                    $('#sql-result').html(html);
+                } else {
+                    $('#sql-result').html('<div class="alert alert-success">' + data.message + '</div>');
+                }
+            } else {
+                $('#sql-result').html('<div class="alert alert-danger">Error: ' + data.error + '</div>');
+            }
+        });
+    });
+</script>
+{% endblock %}

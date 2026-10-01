@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+{% block title %}My Databases - AURA Hosting{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <div>
+        <h1 class="page-title">Persistent Databases (.db)</h1>
+        <p class="page-subtitle">SQLite databases auto-detected from your workspace</p>
+    </div>
+    <div>
+        <a href="{{ url_for('dashboard') }}" class="btn-cyber-secondary">
+            <i class="fa-solid fa-gauge-high"></i> Dashboard
+        </a>
+    </div>
+</div>
+
+{% if databases %}
+<div class="process-grid">
+    {% for db in databases %}
+    <div class="cyber-card" style="display: flex; flex-direction: column; justify-content: space-between;">
+        <div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 1.25rem;">
+            <div class="type-icon" style="background: rgba(236, 72, 153, 0.2); color: var(--accent-pink); width: 48px; height: 48px;">
+                <i class="fa-solid fa-database" style="font-size: 1.4rem;"></i>
+            </div>
+            <div>
+                <h3 style="font-size: 1.1rem; font-weight: 700; color: #fff;">{{ db.orig_name }}</h3>
+                <span style="font-size: 0.78rem; color: var(--text-dim);">SQLite Storage</span>
+            </div>
+        </div>
+
+        <div style="display: flex; gap: 0.5rem; border-top: 1px solid var(--border-subtle); padding-top: 1rem; align-items: center;">
+            <a href="{{ url_for('my_database_tables', db_id=db.id) }}" class="btn-cyber-primary" style="flex: 1; justify-content: center; text-decoration: none;">
+                <i class="fa-solid fa-table"></i> Browse Tables & SQL
+            </a>
+            <form method="POST" action="{{ url_for('my_database_delete', db_id=db.id) }}" onsubmit="return confirm('Are you sure you want to permanently delete {{ db.orig_name }}?');" style="margin: 0;">
+                <button type="submit" class="btn-cyber-danger" style="padding: 0.75rem 0.95rem !important;" title="Delete Database">
+                    <i class="fa-solid fa-trash"></i>
+                </button>
+            </form>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% else %}
+<div class="empty-state">
+    <div class="empty-icon">
+        <i class="fa-solid fa-database"></i>
+    </div>
+    <h3 class="empty-title">No Databases Detected</h3>
+    <p class="empty-desc">When your bots generate or use SQLite .db files, they will automatically appear here for inspection and editing.</p>
+</div>
+{% endif %}
+{% endblock %}

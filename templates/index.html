@@ -1,0 +1,61 @@
+{% extends "base.html" %}
+{% block title %}AURA Hosting - Next-Gen Bot Hosting Platform{% endblock %}
+
+{% block content %}
+<div style="text-align: center; padding: 4rem 1rem 2rem; max-width: 900px; margin: 0 auto;">
+    <div style="display: inline-flex; align-items: center; gap: 0.5rem; background: rgba(139, 92, 246, 0.15); border: 1px solid rgba(139, 92, 246, 0.3); padding: 0.4rem 1.25rem; border-radius: var(--radius-full); font-size: 0.85rem; font-weight: 700; color: #a78bfa; margin-bottom: 1.5rem;">
+        <i class="fa-solid fa-bolt"></i> Next-Gen 24/7 Cloud Bot Hosting
+    </div>
+
+    <h1 style="font-size: 3.2rem; font-weight: 800; line-height: 1.15; letter-spacing: -0.03em; margin-bottom: 1.25rem; background: linear-gradient(135deg, #fff 0%, #a5f3fc 50%, #93c5fd 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">
+        Deploy Python & PHP Bots with Zero Downtime
+    </h1>
+
+    <p style="font-size: 1.15rem; color: var(--text-muted); max-width: 650px; margin: 0 auto 2.5rem; line-height: 1.6;">
+        Instant cloud deployment, automatic dependency resolution, persistent SQLite & JSON storage, and real-time monitoring.
+    </p>
+
+    <div style="display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap;">
+        <a href="{{ url_for('register') }}" class="btn-cyber-primary" style="width: auto; padding: 1rem 2rem; font-size: 1.05rem;">
+            <i class="fa-solid fa-rocket"></i> Start Hosting Free
+        </a>
+        <a href="{{ url_for('login') }}" class="btn-cyber-secondary" style="width: auto; padding: 1rem 2rem; font-size: 1.05rem;">
+            <i class="fa-solid fa-right-to-bracket"></i> Control Panel Login
+        </a>
+    </div>
+</div>
+
+<div class="metrics-grid" style="margin-top: 4rem;">
+    <div class="cyber-card" style="text-align: left;">
+        <div class="metric-icon purple" style="margin-bottom: 1rem;">
+            <i class="fa-brands fa-python"></i>
+        </div>
+        <h3 style="font-size: 1.2rem; font-weight: 700; color: #fff; margin-bottom: 0.5rem;">Python & PHP Support</h3>
+        <p style="font-size: 0.9rem; color: var(--text-muted);">Host Telegram bots, Discord bots, webhooks, or automation scripts with zero configuration.</p>
+    </div>
+
+    <div class="cyber-card" style="text-align: left;">
+        <div class="metric-icon cyan" style="margin-bottom: 1rem;">
+            <i class="fa-solid fa-box-open"></i>
+        </div>
+        <h3 style="font-size: 1.2rem; font-weight: 700; color: #fff; margin-bottom: 0.5rem;">Auto Package Installer</h3>
+        <p style="font-size: 0.9rem; color: var(--text-muted);">Automatically detects missing PyPI modules or requirements.txt and installs them seamlessly.</p>
+    </div>
+
+    <div class="cyber-card" style="text-align: left;">
+        <div class="metric-icon emerald" style="margin-bottom: 1rem;">
+            <i class="fa-solid fa-database"></i>
+        </div>
+        <h3 style="font-size: 1.2rem; font-weight: 700; color: #fff; margin-bottom: 0.5rem;">Persistent Storage</h3>
+        <p style="font-size: 0.9rem; color: var(--text-muted);">Auto-detects .db databases and .json files with built-in online table browsers and editors.</p>
+    </div>
+
+    <div class="cyber-card" style="text-align: left;">
+        <div class="metric-icon blue" style="margin-bottom: 1rem;">
+            <i class="fa-solid fa-clock-rotate-left"></i>
+        </div>
+        <h3 style="font-size: 1.2rem; font-weight: 700; color: #fff; margin-bottom: 0.5rem;">24/7 Uptime & Logs</h3>
+        <p style="font-size: 0.9rem; color: var(--text-muted);">Continuous background process execution with live log viewers and instant auto-restarts.</p>
+    </div>
+</div>
+{% endblock %}

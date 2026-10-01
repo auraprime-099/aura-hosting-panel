@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+{% block title %}Edit JSON - AURA Hosting{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <div>
+        <h1 class="page-title">Editing JSON: {{ json_file.orig_name }}</h1>
+        <p class="page-subtitle">Ensure valid JSON formatting before saving</p>
+    </div>
+    <div>
+        <a href="{{ url_for('my_json_files') }}" class="btn-cyber-secondary">
+            <i class="fa-solid fa-arrow-left"></i> Back to JSON Storage
+        </a>
+    </div>
+</div>
+
+<div class="editor-container">
+    <div class="editor-header">
+        <span style="font-weight: 700; font-size: 0.9rem; color: var(--accent-emerald);">
+            <i class="fa-solid fa-file-code"></i> {{ json_file.orig_name }}
+        </span>
+        <span style="font-size: 0.8rem; color: var(--text-dim);">JSON Format</span>
+    </div>
+
+    <form method="POST" id="json-form">
+        <textarea name="content" class="editor-textarea" spellcheck="false">{{ content }}</textarea>
+
+        <div style="padding: 1rem 1.25rem; background: #161b22; border-top: 1px solid var(--border-subtle); display: flex; gap: 0.75rem; justify-content: flex-end;">
+            <a href="{{ url_for('my_json_files') }}" class="btn-cyber-secondary">Cancel</a>
+            <button type="submit" class="btn-cyber-primary" style="width: auto;">
+                <i class="fa-solid fa-floppy-disk"></i> Save JSON
+            </button>
+        </div>
+    </form>
+</div>
+
+<script>
+    document.getElementById('json-form').addEventListener('submit', function(e) {
+        var content = document.querySelector('textarea[name="content"]').value;
+        try {
+            JSON.parse(content);
+        } catch(err) {
+            alert('Invalid JSON Syntax: ' + err.message);
+            e.preventDefault();
+        }
+    });
+</script>
+{% endblock %}

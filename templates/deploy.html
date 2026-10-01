@@ -1,0 +1,109 @@
+{% extends "base.html" %}
+{% block title %}Deploy Bot - AURA Hosting{% endblock %}
+
+{% block content %}
+<div style="max-width: 600px; margin: 2rem auto;">
+    <div class="cyber-card" style="text-align: center;">
+        <div style="margin-bottom: 2rem;">
+            <div class="auth-brand-icon" style="background: var(--gradient-primary);">
+                <i class="fa-solid fa-rocket"></i>
+            </div>
+            <h1 class="page-title" style="font-size: 1.8rem;">Deploy Bot to Cloud</h1>
+            <p class="page-subtitle">Upload your Python or PHP script / zip archive to deploy live</p>
+        </div>
+
+        <!-- Engine Selector -->
+        <div style="display: flex; gap: 0.75rem; margin-bottom: 2rem; background: rgba(9, 13, 22, 0.6); padding: 0.4rem; border-radius: var(--radius-md); border: 1px solid var(--border-subtle);">
+            <button type="button" class="btn-cyber-secondary type-btn active" id="btn-python" style="flex: 1; border: none;" data-type="py">
+                <i class="fa-brands fa-python" style="color: #60a5fa;"></i> Python (.py / .zip)
+            </button>
+            <button type="button" class="btn-cyber-secondary type-btn" id="btn-php" style="flex: 1; border: none;" data-type="php">
+                <i class="fa-brands fa-php" style="color: #a78bfa;"></i> PHP (.php)
+            </button>
+        </div>
+
+        <form action="{{ url_for('upload_deploy') }}" method="POST" enctype="multipart/form-data" id="deploy-form" class="cyber-form">
+            <div style="border: 2px dashed var(--border-subtle); border-radius: var(--radius-lg); padding: 2.5rem 1.5rem; text-align: center; cursor: pointer; transition: var(--transition-fast); background: rgba(9, 13, 22, 0.4);" id="drop-zone">
+                <i class="fa-solid fa-cloud-arrow-up" style="font-size: 3rem; color: var(--accent-cyan); margin-bottom: 1rem;"></i>
+                <div style="font-weight: 700; font-size: 1.1rem; color: #fff;">Click or Drag File Here</div>
+                <div style="font-size: 0.85rem; color: var(--text-muted); margin-top: 0.25rem;" id="deploy-file-name">Supports .py, .php, .zip, .tar.gz</div>
+                
+                <input type="file" name="file" id="deploy-file-input" accept=".py,.zip,.tar.gz" required style="display: none;">
+            </div>
+
+            <!-- Optional Startup Execution Settings -->
+            <div style="margin-top: 1.5rem; text-align: left; background: rgba(9, 13, 22, 0.4); padding: 1.25rem; border-radius: var(--radius-md); border: 1px solid var(--border-subtle);">
+                <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.75rem;">
+                    <span style="font-size: 0.9rem; font-weight: 700; color: #fff;">
+                        <i class="fa-solid fa-sliders" style="color: var(--accent-cyan); margin-right: 0.35rem;"></i> Execution Settings (Optional)
+                    </span>
+                    <span style="font-size: 0.75rem; color: var(--accent-cyan);">Auto-detected if left empty</span>
+                </div>
+                
+                <div style="margin-bottom: 1rem;">
+                    <label style="display: block; font-size: 0.8rem; color: var(--text-muted); margin-bottom: 0.35rem;">
+                        Main Entry File to Run
+                    </label>
+                    <input type="text" name="entry_file" placeholder="e.g. bot.py, main.py, index.php" class="cyber-input no-icon" style="width: 100%; font-size: 0.85rem; padding: 0.55rem 0.85rem;">
+                    <small style="display: block; font-size: 0.75rem; color: var(--text-dim); margin-top: 0.25rem;">Specify the main file inside your zip/project to execute.</small>
+                </div>
+
+                <div>
+                    <label style="display: block; font-size: 0.8rem; color: var(--text-muted); margin-bottom: 0.35rem;">
+                        Custom Run Command
+                    </label>
+                    <input type="text" name="custom_cmd" placeholder="e.g. python bot.py (leave blank for default)" class="cyber-input no-icon" style="width: 100%; font-size: 0.85rem; padding: 0.55rem 0.85rem;">
+                    <small style="display: block; font-size: 0.75rem; color: var(--text-dim); margin-top: 0.25rem;">Override command with your own (e.g. <code>python -m bot</code> or <code>php index.php</code>).</small>
+                </div>
+            </div>
+
+            <button type="submit" class="btn-cyber-primary" style="margin-top: 1.5rem;">
+                <i class="fa-solid fa-bolt"></i>
+                <span>Deploy Process Now</span>
+            </button>
+        </form>
+
+        <div style="margin-top: 1.5rem;">
+            <a href="{{ url_for('dashboard') }}" class="form-link">
+                <i class="fa-solid fa-arrow-left"></i> Back to Control Panel
+            </a>
+        </div>
+    </div>
+</div>
+
+<script>
+    const phpBtn = document.getElementById('btn-php');
+    const pythonBtn = document.getElementById('btn-python');
+    const fileInput = document.getElementById('deploy-file-input');
+    const fileNameSpan = document.getElementById('deploy-file-name');
+    const dropZone = document.getElementById('drop-zone');
+
+    pythonBtn.addEventListener('click', () => {
+        fileInput.accept = '.py,.zip,.tar.gz';
+        pythonBtn.classList.add('btn-cyber-primary');
+        pythonBtn.classList.remove('btn-cyber-secondary');
+        phpBtn.classList.add('btn-cyber-secondary');
+        phpBtn.classList.remove('btn-cyber-primary');
+        fileNameSpan.textContent = 'Selected: Python (.py / .zip)';
+        fileInput.value = '';
+    });
+
+    phpBtn.addEventListener('click', () => {
+        fileInput.accept = '.php,.zip,.tar.gz';
+        phpBtn.classList.add('btn-cyber-primary');
+        phpBtn.classList.remove('btn-cyber-secondary');
+        pythonBtn.classList.add('btn-cyber-secondary');
+        pythonBtn.classList.remove('btn-cyber-primary');
+        fileNameSpan.textContent = 'Selected: PHP (.php / .zip)';
+        fileInput.value = '';
+    });
+
+    dropZone.addEventListener('click', () => fileInput.click());
+
+    fileInput.addEventListener('change', () => {
+        if (fileInput.files.length > 0) {
+            fileNameSpan.textContent = '📄 ' + fileInput.files[0].name;
+        }
+    });
+</script>
+{% endblock %}

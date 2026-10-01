@@ -1,0 +1,5 @@
+# Telegram Bot Token from @BotFather
+BOT_TOKEN=8783665602:AAFD87qoWPBRYRKE7XEByk6mB-CKdElFDnw
+
+# Monitoring interval in seconds (default: 4)
+POLL_INTERVAL=4

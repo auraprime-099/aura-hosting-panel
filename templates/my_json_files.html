@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+{% block title %}JSON Storage - AURA Hosting{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <div>
+        <h1 class="page-title">JSON Storage (.json)</h1>
+        <p class="page-subtitle">Auto-detected JSON configuration and data files</p>
+    </div>
+    <div>
+        <a href="{{ url_for('dashboard') }}" class="btn-cyber-secondary">
+            <i class="fa-solid fa-gauge-high"></i> Dashboard
+        </a>
+    </div>
+</div>
+
+{% if json_files %}
+<div class="process-grid">
+    {% for jf in json_files %}
+    <div class="cyber-card" style="display: flex; flex-direction: column; justify-content: space-between;">
+        <div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 1.25rem;">
+            <div class="type-icon" style="background: rgba(16, 185, 129, 0.2); color: var(--accent-emerald); width: 48px; height: 48px;">
+                <i class="fa-solid fa-file-code" style="font-size: 1.4rem;"></i>
+            </div>
+            <div>
+                <h3 style="font-size: 1.1rem; font-weight: 700; color: #fff;">{{ jf.orig_name }}</h3>
+                <span style="font-size: 0.78rem; color: var(--text-dim);">JSON Document</span>
+            </div>
+        </div>
+
+        <div style="display: flex; gap: 0.5rem; border-top: 1px solid var(--border-subtle); padding-top: 1rem; align-items: center;">
+            <a href="{{ url_for('edit_json', json_id=jf.id) }}" class="btn-cyber-primary" style="flex: 1; justify-content: center; text-decoration: none;">
+                <i class="fa-solid fa-pen-to-square"></i> Edit JSON Content
+            </a>
+            <form method="POST" action="{{ url_for('my_json_delete', json_id=jf.id) }}" onsubmit="return confirm('Are you sure you want to permanently delete {{ jf.orig_name }}?');" style="margin: 0;">
+                <button type="submit" class="btn-cyber-danger" style="padding: 0.75rem 0.95rem !important;" title="Delete JSON File">
+                    <i class="fa-solid fa-trash"></i>
+                </button>
+            </form>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% else %}
+<div class="empty-state">
+    <div class="empty-icon">
+        <i class="fa-solid fa-file-code"></i>
+    </div>
+    <h3 class="empty-title">No JSON Files Found</h3>
+    <p class="empty-desc">When your bots generate or store .json files, they will automatically appear here for easy online editing.</p>
+</div>
+{% endif %}
+{% endblock %}

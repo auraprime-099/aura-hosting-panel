@@ -1,0 +1,208 @@
+{% extends "base.html" %}
+{% block title %}User Workspace (ID: {{ user_id }}) - AURA Hosting{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <div>
+        <h1 class="page-title"><i class="fa-solid fa-folder-tree" style="color: var(--accent-cyan); margin-right: 0.5rem;"></i> User: {{ username }} (ID: {{ user_id }})</h1>
+        <p class="page-subtitle">Admin Super File Manager – browse, upload, edit, rename, and manage user files</p>
+    </div>
+    <div style="display: flex; gap: 0.75rem; align-items: center; flex-wrap: wrap;">
+        <a href="{{ url_for('admin_workspace_root') }}" class="btn-cyber-secondary">
+            <i class="fa-solid fa-users"></i> All Users
+        </a>
+        <a href="{{ url_for('admin') }}" class="btn-cyber-secondary">
+            <i class="fa-solid fa-shield-halved"></i> Admin Panel
+        </a>
+        <a href="{{ url_for('dashboard') }}" class="btn-cyber-secondary">
+            <i class="fa-solid fa-gauge-high"></i> Dashboard
+        </a>
+    </div>
+</div>
+
+<!-- Toolbar -->
+<div class="cyber-card" style="margin-bottom: 1.5rem; padding: 1.25rem;">
+    <div style="display: flex; gap: 1rem; flex-wrap: wrap; align-items: center; justify-content: space-between;">
+        <div style="display: flex; gap: 0.75rem; flex-wrap: wrap;">
+            <form action="{{ url_for('admin_workspace_upload', user_id=user_id) }}" method="POST" enctype="multipart/form-data">
+                <input type="hidden" name="current_path" value="{{ current_path }}">
+                <input type="file" name="file" id="upload-file" style="display: none;" onchange="this.form.submit()">
+                <button type="button" class="btn-cyber-primary" onclick="document.getElementById('upload-file').click()">
+                    <i class="fa-solid fa-cloud-arrow-up"></i> Upload File
+                </button>
+            </form>
+
+            <form action="{{ url_for('admin_workspace_new_file', user_id=user_id) }}" method="POST" style="display: flex; gap: 0.5rem;">
+                <input type="hidden" name="current_path" value="{{ current_path }}">
+                <input type="text" name="filename" placeholder="script.py / bot.php" required class="cyber-input no-icon" style="padding: 0.5rem 0.85rem; font-size: 0.85rem; width: 170px;">
+                <button type="submit" class="btn-cyber-secondary">
+                    <i class="fa-solid fa-file-circle-plus"></i> New File
+                </button>
+            </form>
+
+            <form action="{{ url_for('admin_workspace_new_folder', user_id=user_id) }}" method="POST" style="display: flex; gap: 0.5rem;">
+                <input type="hidden" name="current_path" value="{{ current_path }}">
+                <input type="text" name="folder_name" placeholder="Folder name" required class="cyber-input no-icon" style="padding: 0.5rem 0.85rem; font-size: 0.85rem; width: 140px;">
+                <button type="submit" class="btn-cyber-secondary">
+                    <i class="fa-solid fa-folder-plus"></i> New Folder
+                </button>
+            </form>
+        </div>
+
+        <div>
+            <input type="text" id="file-search-input" placeholder="Search items..." class="cyber-input no-icon" style="padding: 0.5rem 0.85rem; font-size: 0.85rem; width: 200px;">
+        </div>
+    </div>
+</div>
+
+<!-- Breadcrumb Nav -->
+<div style="display: flex; align-items: center; flex-wrap: wrap; gap: 0.5rem; font-size: 0.9rem; font-weight: 700; color: var(--text-muted); margin-bottom: 1.5rem; background: rgba(16, 22, 37, 0.6); padding: 0.75rem 1.25rem; border-radius: var(--radius-md); border: 1px solid var(--border-subtle);">
+    <a href="{{ url_for('admin_workspace', user_id=user_id, path='') }}" style="color: var(--accent-cyan); text-decoration: none;">
+        <i class="fa-solid fa-house"></i> {{ username }}'s Root
+    </a>
+    {% if current_path %}
+        {% set parts = current_path.split('/') %}
+        {% set build = [] %}
+        {% for part in parts %}
+            {% set build = build + [part] %}
+            <span style="color: var(--text-dim);">/</span>
+            <a href="{{ url_for('admin_workspace', user_id=user_id, path=build|join('/')) }}" style="color: var(--text-main); text-decoration: none;">{{ part }}</a>
+        {% endfor %}
+    {% endif %}
+</div>
+
+<!-- File Items Grid -->
+<div class="workspace-grid" id="file-container">
+    {% if current_path %}
+    <div class="workspace-card clickable-card" data-name=".." data-url="{{ url_for('admin_workspace', user_id=user_id, path=parent_path) }}">
+        <div class="workspace-icon folder">
+            <i class="fa-solid fa-folder-open"></i>
+        </div>
+        <div>
+            <div class="workspace-name">.. (Go Up)</div>
+            <div class="workspace-meta">Parent directory</div>
+        </div>
+        <div class="workspace-card-actions">
+            <a href="{{ url_for('admin_workspace', user_id=user_id, path=parent_path) }}" class="btn-cyber-secondary" style="padding: 0.35rem 0.65rem; font-size: 0.78rem; width: 100%; text-align: center;">Open</a>
+        </div>
+    </div>
+    {% endif %}
+
+    {% for item in items %}
+        {% set ext = item.name.split('.')[-1].lower() if not item.is_dir else '' %}
+        {% set target_url = url_for('admin_workspace', user_id=user_id, path=item.path) if item.is_dir else url_for('admin_workspace_edit', user_id=user_id, path=item.path) %}
+        <div class="workspace-card clickable-card" data-name="{{ item.name|lower }}" data-url="{{ target_url }}">
+            <div class="workspace-icon {% if item.is_dir %}folder{% elif ext == 'py' %}python{% elif ext == 'php' %}php{% elif ext == 'db' or ext == 'sqlite' %}database{% elif ext == 'json' %}json{% else %}file{% endif %}">
+                {% if item.is_dir %}
+                    <i class="fa-solid fa-folder"></i>
+                {% elif ext == 'py' %}
+                    <i class="fa-brands fa-python"></i>
+                {% elif ext == 'php' %}
+                    <i class="fa-brands fa-php"></i>
+                {% elif ext == 'db' or ext == 'sqlite' %}
+                    <i class="fa-solid fa-database"></i>
+                {% elif ext == 'json' %}
+                    <i class="fa-solid fa-file-code"></i>
+                {% elif ext in ['zip', 'tar', 'gz', 'tgz', 'rar'] %}
+                    <i class="fa-solid fa-file-zipper"></i>
+                {% else %}
+                    <i class="fa-solid fa-file-lines"></i>
+                {% endif %}
+            </div>
+
+            <div>
+                <div class="workspace-name">{{ item.name }}</div>
+                <div class="workspace-meta">
+                    {% if item.is_dir %}DIR{% else %}{{ item.size|filesizeformat }}{% endif %} • {{ item.modified }}
+                </div>
+            </div>
+
+            <div class="workspace-card-actions">
+                {% if item.is_dir %}
+                    <a href="{{ url_for('admin_workspace', user_id=user_id, path=item.path) }}" class="btn-cyber-secondary" style="padding: 0.35rem 0.65rem; font-size: 0.78rem;">Open</a>
+                    <button type="button" class="btn-cyber-secondary btn-admin-rename" data-path="{{ item.path }}" data-name="{{ item.name }}" style="padding: 0.35rem 0.65rem; font-size: 0.78rem;" title="Rename">
+                        <i class="fa-solid fa-pen-to-square"></i>
+                    </button>
+                    <form action="{{ url_for('admin_workspace_delete', user_id=user_id) }}" method="POST" style="display: inline;" onsubmit="return confirm('⚠️ Delete folder and all contents?');">
+                        <input type="hidden" name="path" value="{{ item.path }}">
+                        <button type="submit" class="btn-cyber-danger" style="padding: 0.35rem 0.65rem; font-size: 0.78rem;">
+                            <i class="fa-solid fa-trash"></i>
+                        </button>
+                    </form>
+                {% else %}
+                    <a href="{{ url_for('admin_workspace_edit', user_id=user_id, path=item.path) }}" class="btn-cyber-secondary" style="padding: 0.35rem 0.65rem; font-size: 0.78rem;">Edit</a>
+                    <button type="button" class="btn-cyber-secondary btn-admin-rename" data-path="{{ item.path }}" data-name="{{ item.name }}" style="padding: 0.35rem 0.65rem; font-size: 0.78rem;" title="Rename">
+                        <i class="fa-solid fa-pen-to-square"></i>
+                    </button>
+                    <a href="{{ url_for('admin_workspace_download', user_id=user_id, file_path=item.path) }}" class="btn-cyber-secondary" style="padding: 0.35rem 0.65rem; font-size: 0.78rem;">
+                        <i class="fa-solid fa-download"></i>
+                    </a>
+                    <form action="{{ url_for('admin_workspace_delete', user_id=user_id) }}" method="POST" style="display: inline;" onsubmit="return confirm('Delete file?');">
+                        <input type="hidden" name="path" value="{{ item.path }}">
+                        <button type="submit" class="btn-cyber-danger" style="padding: 0.35rem 0.65rem; font-size: 0.78rem;">
+                            <i class="fa-solid fa-trash"></i>
+                        </button>
+                    </form>
+                {% endif %}
+            </div>
+        </div>
+    {% endfor %}
+</div>
+
+<!-- Admin Rename Modal -->
+<div id="admin-rename-modal" style="display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.75); z-index: 9999; align-items: center; justify-content: center;">
+    <div class="cyber-card" style="width: 100%; max-width: 420px; margin: 1rem; border: 1px solid var(--accent-cyan); box-shadow: 0 0 30px rgba(0, 240, 255, 0.25);">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem;">
+            <h3 style="font-size: 1.2rem; font-weight: 700; color: #fff; margin: 0;">
+                <i class="fa-solid fa-pen-to-square" style="color: var(--accent-cyan);"></i> Rename Item
+            </h3>
+            <button type="button" onclick="closeAdminRenameModal()" style="background: none; border: none; color: var(--text-muted); font-size: 1.5rem; cursor: pointer; line-height: 1;">&times;</button>
+        </div>
+        <form action="{{ url_for('admin_workspace_rename', user_id=user_id) }}" method="POST">
+            <input type="hidden" name="old_path" id="admin-rename-old-path" value="">
+            <div style="margin-bottom: 1.25rem;">
+                <label style="display: block; font-size: 0.85rem; color: var(--text-muted); margin-bottom: 0.5rem;">New Name</label>
+                <input type="text" name="new_name" id="admin-rename-new-name" required class="cyber-input no-icon" style="width: 100%;">
+            </div>
+            <div style="display: flex; gap: 0.75rem; justify-content: flex-end;">
+                <button type="button" class="btn-cyber-secondary" onclick="closeAdminRenameModal()">Cancel</button>
+                <button type="submit" class="btn-cyber-primary">
+                    <i class="fa-solid fa-check"></i> Save Name
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+    function openAdminRenameModal(path, name) {
+        document.getElementById('admin-rename-old-path').value = path;
+        const nameInput = document.getElementById('admin-rename-new-name');
+        nameInput.value = name;
+        const modal = document.getElementById('admin-rename-modal');
+        modal.style.display = 'flex';
+        setTimeout(() => nameInput.focus(), 50);
+    }
+
+    function closeAdminRenameModal() {
+        document.getElementById('admin-rename-modal').style.display = 'none';
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+        document.querySelectorAll('.btn-admin-rename').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                e.preventDefault();
+                openAdminRenameModal(btn.dataset.path, btn.dataset.name);
+            });
+        });
+
+        const modal = document.getElementById('admin-rename-modal');
+        if (modal) {
+            modal.addEventListener('click', (e) => {
+                if (e.target === modal) closeAdminRenameModal();
+            });
+        }
+    });
+</script>
+{% endblock %}

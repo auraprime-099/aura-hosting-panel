@@ -1,0 +1,89 @@
+// AURA HOSTING – Premium Dashboard JavaScript
+$(document).ready(function() {
+    // System stats update
+    function updateStats() {
+        $.get('/api/system', function(data) {
+            $('#cpu').text(data.cpu.toFixed(1));
+            $('#mem').text(data.memory.toFixed(1));
+            $('#running').text(data.running);
+        }).fail(function() {
+            console.error('Failed to fetch system stats');
+        });
+    }
+    updateStats();
+    setInterval(updateStats, 5000);
+
+    // Start button
+    $('.btn-start').click(function() {
+        var btn = $(this);
+        var fileId = btn.data('id');
+        btn.prop('disabled', true).html('⏳ Starting...');
+        $.post('/api/start/' + fileId)
+            .done(function() {
+                btn.html('▶ Start').prop('disabled', false);
+                setTimeout(() => location.reload(), 1500);
+            })
+            .fail(function(xhr) {
+                btn.html('▶ Start').prop('disabled', false);
+                var errorMsg = xhr.responseJSON?.error || 'Start failed';
+                showAlert(errorMsg, 'danger');
+            });
+    });
+
+    // Stop button
+    $('.btn-stop').click(function() {
+        var btn = $(this);
+        var fileId = btn.data('id');
+        btn.prop('disabled', true).html('⏳ Stopping...');
+        $.post('/api/stop/' + fileId)
+            .done(function() {
+                btn.html('⏹ Stop').prop('disabled', false);
+                setTimeout(() => location.reload(), 1500);
+            })
+            .fail(function() {
+                btn.html('⏹ Stop').prop('disabled', false);
+                showAlert('Stop failed', 'danger');
+            });
+    });
+
+    // Logs toggle
+    $('.btn-logs').click(function() {
+        var fileId = $(this).data('id');
+        var logDiv = $('#log-' + fileId);
+        if (logDiv.is(':visible')) {
+            logDiv.slideUp(200);
+        } else {
+            logDiv.slideDown(200);
+            $.get('/api/logs/' + fileId)
+                .done(function(data) {
+                    logDiv.find('pre').text(data.logs || 'No logs available');
+                })
+                .fail(function() {
+                    logDiv.find('pre').text('Failed to fetch logs');
+                });
+        }
+    });
+
+    // Delete button
+    $('.btn-delete').click(function() {
+        var fileId = $(this).data('id');
+        if (confirm('⚠️ Delete this file permanently? This action cannot be undone.')) {
+            $.post('/api/delete/' + fileId)
+                .done(function() {
+                    location.reload();
+                })
+                .fail(function() {
+                    showAlert('Delete failed', 'danger');
+                });
+        }
+    });
+
+    // Helper: show floating alert
+    function showAlert(message, type) {
+        var alertDiv = $('<div class="alert alert-' + type + '">' + message + '</div>');
+        $('.container').prepend(alertDiv);
+        setTimeout(function() {
+            alertDiv.fadeOut(300, function() { $(this).remove(); });
+        }, 4000);
+    }
+});

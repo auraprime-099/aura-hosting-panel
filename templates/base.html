@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}AURA Hosting{% endblock %}</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="icon" href="{{ url_for('static', filename='favicon.ico') }}" type="image/x-icon">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+</head>
+<body class="app-body">
+    <!-- Animated Cyber Orbs Background -->
+    <div class="cyber-bg">
+        <div class="glow-orb orb-purple"></div>
+        <div class="glow-orb orb-blue"></div>
+        <div class="glow-orb orb-cyan"></div>
+    </div>
+
+    <div class="app-wrapper">
+        <!-- Mobile Sidebar Backdrop -->
+        <div class="sidebar-backdrop" id="sidebarBackdrop"></div>
+
+        {% if session.get('user_id') %}
+        <!-- Sidebar Navigation -->
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <a href="{{ url_for('dashboard') }}" class="brand-logo">
+                    <div class="brand-icon"><i class="fa-solid fa-bolt"></i></div>
+                    <span class="brand-name">AURA<span class="brand-highlight">HOST</span></span>
+                </a>
+            </div>
+            
+            <nav class="sidebar-nav">
+                <div class="nav-section-title">MAIN MENU</div>
+                <a href="{{ url_for('dashboard') }}" class="nav-item {% if request.endpoint == 'dashboard' %}active{% endif %}">
+                    <i class="fa-solid fa-gauge-high"></i> <span>Dashboard</span>
+                </a>
+                <a href="{{ url_for('deploy') }}" class="nav-item {% if request.endpoint == 'deploy' %}active{% endif %}">
+                    <i class="fa-solid fa-rocket"></i> <span>Deploy Bot</span>
+                </a>
+                <a href="{{ url_for('workspace') }}" class="nav-item {% if request.endpoint in ['workspace', 'workspace_edit'] %}active{% endif %}">
+                    <i class="fa-solid fa-folder-tree"></i> <span>File Manager</span>
+                </a>
+                <a href="{{ url_for('my_databases') }}" class="nav-item {% if request.endpoint in ['my_databases', 'my_database_tables', 'my_database_table', 'my_edit_row'] %}active{% endif %}">
+                    <i class="fa-solid fa-database"></i> <span>Databases</span>
+                </a>
+                <a href="{{ url_for('my_json_files') }}" class="nav-item {% if request.endpoint in ['my_json_files', 'edit_json'] %}active{% endif %}">
+                    <i class="fa-solid fa-file-code"></i> <span>JSON Storage</span>
+                </a>
+
+                {% if session.get('is_admin') %}
+                <div class="nav-section-title">ADMIN CONTROL</div>
+                <a href="{{ url_for('admin') }}" class="nav-item {% if request.endpoint in ['admin', 'admin_databases'] %}active{% endif %}">
+                    <i class="fa-solid fa-user-shield"></i> <span>Admin Panel</span>
+                </a>
+                <a href="{{ url_for('admin_workspace_root') }}" class="nav-item {% if request.endpoint in ['admin_workspace_root', 'admin_workspace', 'admin_workspace_edit'] %}active{% endif %}">
+                    <i class="fa-solid fa-server"></i> <span>Super File Manager</span>
+                </a>
+                {% endif %}
+            </nav>
+
+            <div class="sidebar-footer">
+                <div class="user-pill">
+                    <div class="user-avatar"><i class="fa-solid fa-user"></i></div>
+                    <div class="user-info">
+                        <span class="user-name">{{ session.get('username') }}</span>
+                        <span class="user-email">{{ session.get('email') }}</span>
+                    </div>
+                </div>
+                <a href="{{ url_for('logout') }}" class="btn-logout-icon" title="Logout">
+                    <i class="fa-solid fa-power-off"></i>
+                </a>
+            </div>
+        </aside>
+        {% endif %}
+
+        <!-- Main Content Area -->
+        <main class="main-content">
+            <!-- Top Navbar -->
+            <header class="topbar">
+                {% if session.get('user_id') %}
+                <button class="mobile-toggle" id="sidebarToggle">
+                    <i class="fa-solid fa-bars"></i>
+                </button>
+                {% else %}
+                <a href="{{ url_for('index') }}" class="brand-logo">
+                    <div class="brand-icon"><i class="fa-solid fa-bolt"></i></div>
+                    <span class="brand-name">AURA<span class="brand-highlight">HOST</span></span>
+                </a>
+                {% endif %}
+
+                <div class="topbar-right">
+                    <div class="clock-badge" id="live-clock">
+                        <i class="fa-regular fa-clock"></i> --:--:--
+                    </div>
+                    {% if not session.get('user_id') %}
+                    <a href="{{ url_for('login') }}" class="btn-top-login">Log In</a>
+                    <a href="{{ url_for('register') }}" class="btn-top-register">Get Started</a>
+                    {% endif %}
+                </div>
+            </header>
+
+            <!-- Page Container -->
+            <div class="page-container">
+                <!-- Flash Alerts -->
+                {% with messages = get_flashed_messages(with_categories=true) %}
+                    {% if messages %}
+                        <div class="flash-container">
+                        {% for category, message in messages %}
+                            <div class="flash-alert flash-{{ category }}">
+                                <span class="flash-icon">
+                                    {% if category == 'success' %}<i class="fa-solid fa-circle-check"></i>
+                                    {% elif category == 'danger' %}<i class="fa-solid fa-triangle-exclamation"></i>
+                                    {% else %}<i class="fa-solid fa-circle-info"></i>{% endif %}
+                                </span>
+                                <span class="flash-text">{{ message }}</span>
+                                <button class="flash-close" onclick="this.parentElement.remove()">&times;</button>
+                            </div>
+                        {% endfor %}
+                        </div>
+                    {% endif %}
+                {% endwith %}
+
+                {% block content %}{% endblock %}
+            </div>
+        </main>
+    </div>
+
+    <script>
+        function updateClock() {
+            const now = new Date();
+            const options = { timeZone: 'Asia/Kolkata', hour12: false, hour: '2-digit', minute: '2-digit', second: '2-digit' };
+            const istTime = now.toLocaleTimeString('en-IN', options);
+            const clockElement = document.getElementById('live-clock');
+            if (clockElement) clockElement.innerHTML = '<i class="fa-regular fa-clock"></i> ' + istTime + ' IST';
+        }
+        setInterval(updateClock, 1000);
+        updateClock();
+
+        // Sidebar toggle with backdrop support
+        const sidebarEl = document.getElementById('sidebar');
+        const backdropEl = document.getElementById('sidebarBackdrop');
+        const toggleBtn = document.getElementById('sidebarToggle');
+
+        function openSidebar() {
+            if (sidebarEl) sidebarEl.classList.add('active');
+            if (backdropEl) backdropEl.classList.add('visible');
+        }
+
+        function closeSidebar() {
+            if (sidebarEl) sidebarEl.classList.remove('active');
+            if (backdropEl) backdropEl.classList.remove('visible');
+        }
+
+        if (toggleBtn) toggleBtn.addEventListener('click', function() {
+            if (sidebarEl && sidebarEl.classList.contains('active')) {
+                closeSidebar();
+            } else {
+                openSidebar();
+            }
+        });
+
+        if (backdropEl) backdropEl.addEventListener('click', closeSidebar);
+    </script>
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+    {% block scripts %}{% endblock %}
+</body>
+</html>

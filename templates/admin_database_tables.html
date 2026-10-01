@@ -1,0 +1,63 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="glass-card dashboard">
+    <div class="header">
+        <h2>🗄️ Database: {{ db.orig_name }} (Owner: {{ db.user.email }})</h2>
+        <div class="user-info">
+            <a href="{{ url_for('admin_databases') }}">← All Databases</a>
+            <a href="{{ url_for('admin') }}">Admin Panel</a>
+        </div>
+    </div>
+    <div class="upload-section">
+        <h3>📋 Tables</h3>
+        <div class="file-grid">
+            {% for table in tables %}
+                <div class="file-card">
+                    <div class="file-header">
+                        <span class="file-name">{{ table }}</span>
+                    </div>
+                    <div class="file-actions">
+                        <a href="{{ url_for('admin_database_table', db_id=db.id, table_name=table) }}" class="btn-primary">📊 View Data</a>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+    <div class="upload-section">
+        <h3>🔧 Execute SQL</h3>
+        <textarea id="sql-query" rows="5" style="width:100%; background:#1e1e2f; color:#fff; border-radius:12px; padding:1rem;" placeholder="SELECT * FROM users"></textarea>
+        <button id="exec-sql" class="btn-primary" style="margin-top:1rem;">▶ Run SQL</button>
+        <div id="sql-result" style="margin-top:1rem;"></div>
+    </div>
+</div>
+<script>
+    $('#exec-sql').click(function() {
+        var sql = $('#sql-query').val();
+        $.post('{{ url_for("admin_execute_sql", db_id=db.id) }}', {sql: sql}, function(data) {
+            if (data.success) {
+                if (data.columns) {
+                    var html = '<table style="width:100%; border-collapse:collapse;">';
+                    html += '<tr>';
+                    for (var i=0; i<data.columns.length; i++) {
+                        html += '<th style="padding:8px; background:rgba(255,255,255,0.1);">' + data.columns[i] + '</th>';
+                    }
+                    html += '</tr>';
+                    for (var r=0; r<data.rows.length; r++) {
+                        html += '<tr>';
+                        for (var c=0; c<data.columns.length; c++) {
+                            html += '<td style="padding:8px; border-bottom:1px solid rgba(255,255,255,0.1);">' + data.rows[r][data.columns[c]] + '</td>';
+                        }
+                        html += '</tr>';
+                    }
+                    html += '</table>';
+                    $('#sql-result').html(html);
+                } else {
+                    $('#sql-result').html('<div class="alert alert-success">' + data.message + '</div>');
+                }
+            } else {
+                $('#sql-result').html('<div class="alert alert-danger">Error: ' + data.error + '</div>');
+            }
+        });
+    });
+</script>
+{% endblock %}

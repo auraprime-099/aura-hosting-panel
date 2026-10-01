@@ -1,0 +1,6 @@
+flask
+flask-session
+werkzeug
+sqlalchemy
+gunicorn
+pyrebase4

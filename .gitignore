@@ -1,0 +1,13 @@
+data/
+__pycache__/
+*.pyc
+*.pyo
+flask_session/
+*.db
+*.log
+.env
+users_live*.db
+bot_folder_bot.db
+flyctl.zip
+flyctl_bin/
+*.zip

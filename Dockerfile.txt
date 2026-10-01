@@ -1,0 +1,27 @@
+FROM python:3.11.15-slim   # 👈 Yahan change kiya
+
+# For Debian 12 (bookworm) – use versioned packages
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    php8.2-cli \
+    php8.2-curl \
+    php8.2-mbstring \
+    php8.2-xml \
+    php8.2-zip \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/*
+
+# Create symlink so 'php' command works
+RUN ln -s /usr/bin/php8.2 /usr/bin/php || true
+
+RUN php -v
+
+WORKDIR /app
+
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
+
+COPY . .
+
+EXPOSE 5000
+
+CMD ["gunicorn", "app:app"]

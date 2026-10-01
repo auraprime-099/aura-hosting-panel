@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+{% block title %}Edit {{ filename }} - AURA Hosting{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <div>
+        <h1 class="page-title">Code Editor: {{ filename }}</h1>
+        <p class="page-subtitle">Path: {{ file_path }}</p>
+    </div>
+    <div style="display: flex; gap: 0.75rem;">
+        <a href="{{ url_for('workspace', path=file_path|dirname) }}" class="btn-cyber-secondary">
+            <i class="fa-solid fa-arrow-left"></i> Back to Workspace
+        </a>
+    </div>
+</div>
+
+<div class="editor-container">
+    <div class="editor-header">
+        <span style="font-weight: 700; font-size: 0.9rem; color: var(--accent-cyan);">
+            <i class="fa-solid fa-file-code"></i> {{ filename }}
+        </span>
+        <span style="font-size: 0.8rem; color: var(--text-dim);">UTF-8</span>
+    </div>
+
+    <form method="POST" action="{{ url_for('workspace_save') }}">
+        <input type="hidden" name="path" value="{{ file_path }}">
+        <textarea name="content" class="editor-textarea" spellcheck="false">{{ content }}</textarea>
+
+        <div style="padding: 1rem 1.25rem; background: #161b22; border-top: 1px solid var(--border-subtle); display: flex; gap: 0.75rem; justify-content: flex-end;">
+            <a href="{{ url_for('workspace', path=file_path|dirname) }}" class="btn-cyber-secondary">Cancel</a>
+            <button type="submit" class="btn-cyber-primary" style="width: auto;">
+                <i class="fa-solid fa-floppy-disk"></i> Save Changes
+            </button>
+        </div>
+    </form>
+</div>
+{% endblock %}
