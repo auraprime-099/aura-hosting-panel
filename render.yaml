@@ -9,7 +9,5 @@ services:
         value: 10000
       - key: FLASK_ENV
         value: production
-    disk:
-      name: aura-data
-      mountPath: /app/data
-      sizeGB: 1
+      - key: SECRET_KEY
+        generateValue: true
