@@ -1,9 +1,6 @@
-data/
 __pycache__/
 *.pyc
-*.pyo
 flask_session/
-*.db
 *.log
 .env
 users_live*.db
