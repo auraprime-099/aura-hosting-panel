@@ -1,0 +1,11 @@
+2026-09-05 17:51:27,715 - __main__ - INFO - Bot commands menu set successfully.
+2026-09-05 17:51:28,048 - aiogram.dispatcher - INFO - Start polling
+2026-09-05 17:51:28,239 - aiogram.dispatcher - INFO - Run polling for bot @ASHUXPROMO_BOT id=8686874383 - '𝐕𝐀𝐋𝐈 𝐌𝐎𝐃𝐒 𝐏𝐀𝐈𝐃 𝐏𝐀𝐍𝐄𝐋'
+2026-09-05 17:51:28,642 - aiogram.event - INFO - Update id=905145522 is not handled. Duration 31 ms by bot id=8686874383
+2026-09-05 18:04:32,590 - aiogram.event - INFO - Update id=905145523 is handled. Duration 1225 ms by bot id=8686874383
+2026-09-05 18:04:38,262 - aiogram.event - INFO - Update id=905145524 is handled. Duration 665 ms by bot id=8686874383
+2026-09-05 18:04:42,307 - aiogram.event - INFO - Update id=905145525 is handled. Duration 427 ms by bot id=8686874383
+2026-09-05 18:12:09,687 - aiogram.event - INFO - Update id=905145526 is handled. Duration 510 ms by bot id=8686874383
+2026-09-05 18:12:23,039 - aiogram.event - INFO - Update id=905145527 is handled. Duration 390 ms by bot id=8686874383
+2026-09-05 18:12:25,975 - aiogram.event - INFO - Update id=905145528 is handled. Duration 360 ms by bot id=8686874383
+2026-09-05 18:12:27,926 - aiogram.event - INFO - Update id=905145529 is handled. Duration 430 ms by bot id=8686874383

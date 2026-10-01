@@ -1,0 +1,12 @@
+2026-04-02 12:21:03,023 - __main__ - INFO - Loaded 289 bombing APIs
+Traceback (most recent call last):
+  File "C:\Users\BHARAT\Downloads\Telegram Desktop\project\data\uploads\1\1775112579_group.py", line 5563, in <module>
+    main()
+    ~~~~^^
+  File "C:\Users\BHARAT\Downloads\Telegram Desktop\project\data\uploads\1\1775112579_group.py", line 5555, in main
+    print("Bot is running with all APIs active, time\u2011based bombing, multi\u2011user support, admin stop with list, and initiator display.")
+    ~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Program Files\WindowsApps\PythonSoftwareFoundation.Python.3.13_3.13.3312.0_x64__qbz5n2kfra8p0\Lib\encodings\cp1252.py", line 19, in encode
+    return codecs.charmap_encode(input,self.errors,encoding_table)[0]
+           ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+UnicodeEncodeError: 'charmap' codec can't encode character '\u2011' in position 41: character maps to <undefined>

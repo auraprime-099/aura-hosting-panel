@@ -5,6 +5,3 @@ flask_session/
 .env
 users_live*.db
 bot_folder_bot.db
-flyctl.zip
-flyctl_bin/
-*.zip
